@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Night Market</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#12142b;--surface:#1c1f3f;--ink:#eceef9;--mute:#9aa1c9;--line:#2c3060;--amber:#e8a317;--amber-ink:#2b1d00;--teal:#4fc3c0;--danger:#ff8a80;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "DM Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","DM Sans",system-ui,sans-serif;margin:0;line-height:1.2}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 16px 0}
+.bar{max-width:880px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-size:1.4rem}
+.note,.meta{font-size:.82rem;color:var(--mute)}
+nav{max-width:880px;margin:8px auto 0;display:flex;gap:4px;overflow-x:auto}
+nav button{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;color:var(--mute);padding:8px 14px;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);border-color:var(--amber)}
+main{max-width:880px;margin:0 auto;padding:16px}
+button{font:inherit;font-weight:700;background:var(--amber);color:var(--amber-ink);border:0;border-radius:10px;padding:9px 16px;cursor:pointer}
+button.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+button.small{padding:3px 10px;font-size:.85rem}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+input,textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+label{display:block;font-weight:700;margin:14px 0 4px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.tile{height:130px;background-size:cover;background-position:center;display:grid;place-items:center;font:700 2.6rem "Bricolage Grotesque",sans-serif;color:#fff}
+.body{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.price{font-weight:700;color:var(--teal);margin:0}
+.desc{margin:0;color:var(--mute);font-size:.92rem;flex:1;overflow-wrap:anywhere}
+.meta{margin:0}
+.row{display:flex;gap:8px;margin-top:6px}
+.card .row{flex-wrap:wrap}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.checks{display:flex;gap:14px;flex-wrap:wrap}
+.checks label,label.chk{font-weight:500;margin:0;display:flex;gap:6px;align-items:center}
+.checks input,label.chk input{width:auto}
+label.chk{margin-top:14px}
+.steps{list-style:none;padding:0;margin:12px 0}
+.steps li{padding:5px 0 5px 26px;position:relative;color:var(--mute)}
+.steps li::before{content:"";position:absolute;left:4px;top:11px;width:12px;height:12px;border-radius:50%;border:2px solid var(--line)}
+.steps li.done{color:var(--ink)}
+.steps li.done::before{background:var(--teal);border-color:var(--teal)}
+.code{font:700 2rem "Bricolage Grotesque",sans-serif;letter-spacing:.3em;background:var(--bg);border:1px dashed var(--amber);border-radius:10px;padding:8px 14px;display:inline-block}
+.err{color:var(--danger);font-weight:700;margin:6px 0 0}
+.empty{color:var(--mute);text-align:center;padding:40px 0}
+.held{font-weight:700;color:var(--teal);margin:6px 0 0}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;margin-top:12px}
+.chip{background:none;color:var(--ink);border:1px solid var(--line);white-space:nowrap;padding:6px 14px;border-radius:99px}
+.chip[aria-pressed="true"]{background:var(--amber);color:var(--amber-ink);border-color:var(--amber)}
+.tag{background:var(--bg);border-radius:6px;padding:1px 8px;margin-right:4px;color:var(--ink)}
+#overlay{position:fixed;inset:0;background:rgba(10,12,30,.6);display:none;align-items:flex-end;justify-content:center;z-index:20}
+#overlay.on{display:flex}
+#modal{background:var(--surface);width:100%;max-width:520px;max-height:85%;overflow:auto;border-radius:18px 18px 0 0;padding:20px}
+.msgs{display:flex;flex-direction:column;gap:6px;margin:12px 0;min-height:120px;max-height:40vh;overflow:auto}
+.msg{max-width:80%;padding:8px 12px;border-radius:12px;background:var(--bg);overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;background:var(--amber);color:var(--amber-ink)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;display:none;z-index:30;max-width:90%}
+@media (min-width:600px){#overlay{align-items:center}#modal{border-radius:18px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar"><h1>Night Market</h1><span class="note" id="who"></span></div>
+  <nav id="nav" role="tablist"></nav>
+</header>
+<main id="view"></main>
+<div id="overlay"><div id="modal" role="dialog" aria-modal="true"></div></div>
+<div id="toast" role="status"></div>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'\u20a6'+Number(n).toLocaleString();
+const STEPS=['Order placed','Rider assigned','Picked up from seller','Rider at your door','Delivered, handoff confirmed'];
+const CATS=['Fashion','Electronics','Collectibles','Home','Beauty','Sports','Other'];
+const TIMES=['As soon as possible','Tonight, 9pm to midnight','Late night, after midnight'];
+const HUES=['#2f3f8f','#c0561e','#17807e','#6a3d8f','#8a6a1f','#8f3f5f','#2f7f4f'];
+const S={me:null,needInvite:true,invites:[],tab:'browse',q:'',cat:'All',authMode:'login',listings:[],orders:[],threads:[],jobs:[],admin:null,chat:null};
+
+async function api(m,p,b){
+  const r=await fetch('/api'+p,{method:m,headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});
+  let j={};try{j=await r.json()}catch(e){}
+  if(!r.ok){const e=new Error(j.error||'Something went wrong');e.status=r.status;throw e}
+  return j;
+}
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',2800)}
+function openModal(h){$('modal').innerHTML=h;$('overlay').classList.add('on')}
+function closeModal(){S.chat=null;$('overlay').classList.remove('on')}
+const modalOpen=()=>$('overlay').classList.contains('on');
+const rate=r=>r&&r.n?`\u2605 ${r.avg} (${r.n})`:'New seller';
+
+// ---------- data ----------
+async function load(){
+  if(!S.me)return;
+  const t=S.tab;
+  try{
+    S.listings=(await api('GET','/listings')).listings;
+    if(t==='messages')S.threads=(await api('GET','/threads')).threads;
+    if(t==='invite')S.invites=(await api('GET','/invites')).invites;
+    if(t==='orders')S.orders=(await api('GET','/orders')).orders;
+    if(t==='rider'){
+      if(S.me.rider!=='approved'){const r=await api('GET','/me');if(r.user)S.me=r.user}
+      if(S.me.rider==='approved')S.jobs=(await api('GET','/jobs')).jobs;
+    }
+    if(t==='admin'&&S.me.isAdmin)S.admin=await api('GET','/admin');
+  }catch(e){if(e.status===401){S.me=null}else toast(e.message)}
+}
+async function refresh(){await load();render()}
+async function run(f){try{await f()}catch(e){if(e.status===401){S.me=null;render()}else toast(e.message)}}
+
+// ---------- views ----------
+function authView(){
+  const su=S.authMode==='signup';
+  return `<form class="panel" id="authForm"><h2>${su?'Create your account':'Log in'}</h2>
+<label for="un">Name</label><input id="un" required maxlength="24" autocomplete="username">
+<label for="pw">Password</label><input id="pw" type="password" required minlength="6" autocomplete="${su?'new-password':'current-password'}">
+${su?(S.needInvite?'<label for="iv">Invite code</label><input id="iv" maxlength="20" autocomplete="off">':'<p class="note">You are the first member, so no invite is needed. You will be the admin.</p>'):''}
+${su?'<label class="chk"><input type="checkbox" id="rd"> I also want to be a rider</label>':''}
+<p class="err" id="aerr"></p>
+<div class="row"><button type="submit">${su?'Sign up':'Log in'}</button><button type="button" class="ghost" data-auth="${su?'login':'signup'}">${su?'I have an account':'Create an account'}</button></div>
+<p class="note">The first account created on this server becomes the admin.</p></form>`;
+}
+function card(l){
+  const own=l.sellerId===S.me.id;
+  return `<article class="card"><div class="tile" style="${l.img?`background-image:url('${l.img}')`:`background:${HUES[l.id%HUES.length]}`}">${l.img?'':esc(l.title[0]||'?')}</div>
+<div class="body"><h3>${esc(l.title)}</h3><p class="price">${money(l.price)}</p><p class="desc">${esc(l.desc)}</p>
+<p class="meta"><span class="tag">${esc(l.cat)}</span> Sold by ${esc(l.seller)} (${rate(l.rating)}). Pays in crypto${l.coins?': '+esc(l.coins):''}</p>
+${own?'<p class="meta">This is your listing.</p>':`<div class="row"><button class="ghost" data-chat="${l.id}">Message seller</button><button class="ghost" data-trade="${l.id}">Offer a trade</button><button data-buy="${l.id}">Buy</button></div>`}</div></article>`;
+}
+function gridHtml(){
+  const q=S.q.toLowerCase();
+  const it=S.listings.filter(l=>(S.cat==='All'||l.cat===S.cat)&&(l.title+' '+l.desc).toLowerCase().includes(q));
+  return it.map(card).join('')||'<p class="empty">No listings here yet. Post something from the Sell tab.</p>';
+}
+function browse(){
+  return `<input id="search" type="search" placeholder="Search listings" value="${esc(S.q)}" aria-label="Search listings">
+<div class="chips">${['All',...CATS].map(c=>`<button class="chip" aria-pressed="${S.cat===c}" data-cat="${c}">${c}</button>`).join('')}</div>
+<div class="grid" id="grid" style="margin-top:14px">${gridHtml()}</div>`;
+}
+function sell(){
+  const mine=S.listings.filter(l=>l.sellerId===S.me.id);
+  return `<form class="panel" id="sellForm"><h2>List an item</h2>
+<label for="t">Title (the name of the product)</label><input id="t" required maxlength="80" placeholder="e.g. Adidas Samba, size 42">
+<label for="cat">Category</label><select id="cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select>
+<label for="p">Price (\u20a6)</label><input id="p" type="number" min="0" required>
+<label for="d">Description (other details)</label><textarea id="d" rows="4" required maxlength="1000" placeholder="Condition, size, what's included"></textarea>
+<label for="co">Accepted coins (optional)</label><input id="co" maxlength="60" placeholder="e.g. USDT, BTC"><p class="note">Payment is crypto only. Agree the coin, amount and wallet address with the buyer in chat.</p>
+<label for="f">Photo (optional)</label><input id="f" type="file" accept="image/*">
+<div class="row" style="margin-top:18px"><button type="submit">Post listing</button></div></form>
+${mine.length?`<h2>Your listings</h2>${mine.map(l=>`<div class="panel"><strong>${esc(l.title)}</strong> <span class="meta">${money(l.price)}</span><div class="row"><button class="ghost" data-del="${l.id}">Remove</button></div></div>`).join('')}`:''}`;
+}
+function messages(){
+  if(!S.threads.length)return '<p class="empty">No conversations yet. Message a seller from Browse.</p>';
+  return S.threads.map(t=>`<div class="panel"><h3>${esc(t.title)}</h3><p class="meta">With ${esc(t.other)}. ${esc(t.last)}</p><div class="row"><button data-thread="${t.listingId}:${t.buyerId}">Open chat</button></div></div>`).join('');
+}
+function orderCard(o){
+  const done=o.step===4,buy=o.role==='buying';
+  return `<section class="panel"><h3>${esc(o.title)}</h3>
+<p class="meta">${buy?`Buying from ${esc(o.sellerName)}. To: ${esc(o.addr)}`:`Selling to ${esc(o.buyerName)}`}. Pay with ${esc(o.pay)}. Delivery: ${esc(o.time)}.${o.riderName?` Rider: ${esc(o.riderName)}.`:''}</p>
+<p class="held">${done?'Handoff confirmed. Payment of '+money(o.price)+' is due to the seller':'Agreed price '+money(o.price)+', due after the handoff is confirmed'}</p>
+<p class="meta">Delivery fee: ${money(o.fee)}${buy&&o.recipient?`. Receiving: ${esc(o.recipient)}`:''}</p>
+${buy&&o.step===0?(o.counter?`<div class="panel"><p>${esc(o.counter.rider)} asks ${money(o.counter.fee)} for the delivery.</p><div class="row"><button data-answer="${o.id}:1">Accept</button><button class="ghost" data-answer="${o.id}:0">Decline</button></div></div>`:`<div class="row"><input id="nf${o.id}" type="number" min="0" placeholder="New fee" style="max-width:160px"><button class="ghost" data-newfee="${o.id}">Change fee</button></div>`)+`<div class="row"><button class="ghost" data-cancel="${o.id}">Cancel order</button></div>`:''}
+${buy&&o.step>=1&&o.step<4?`<p class="meta">Pay the delivery fee in crypto to your rider${o.riderWallet?': '+esc(o.riderWallet):'. They have not added a wallet address yet, so ask them.'}</p>`:''}
+<ul class="steps">${STEPS.map((s,i)=>`<li class="${i<=o.step?'done':''}">${s}</li>`).join('')}</ul>
+${buy&&o.code?`<p>Your delivery code. Give it to the person receiving the package, and only after they have checked the item and are happy with it:</p><div class="code">${esc(o.code)}</div>`:''}
+${buy&&done?(o.rating?`<p class="meta">You rated ${esc(o.sellerName)} ${o.rating} out of 5.</p>`:`<p class="meta">Rate ${esc(o.sellerName)}:</p><div class="row">${[1,2,3,4,5].map(n=>`<button class="ghost" data-rate="${o.id}:${n}">${n}</button>`).join('')}</div>`):''}
+<div class="row"><button class="ghost" data-report="${o.id}">Report a problem</button></div></section>`;
+}
+function orders(){
+  const b=S.orders.filter(o=>o.role==='buying'),s=S.orders.filter(o=>o.role==='selling');
+  if(!S.orders.length)return '<p class="empty">No orders yet. Buy something from Browse.</p>';
+  return `<p class="note">This app tracks agreements and handoffs. It does not move money: buyer and seller settle payment themselves.</p>
+${b.length?`<h2>Buying</h2>${b.map(orderCard).join('')}`:''}${s.length?`<h2>Selling</h2>${s.map(orderCard).join('')}`:''}`;
+}
+function invite(){
+  return `<div class="panel"><h2>Invite a friend</h2><p>This market is invite-only. Each code works once, and you are responsible for who you bring in.</p><button data-newinvite>Create an invite code</button></div>${S.invites.map(i=>`<div class="panel"><div class="code">${esc(i.code)}</div><p class="meta">${i.used?'Used by '+esc(i.usedBy):'Not used yet. Send it to your friend.'}</p></div>`).join('')}`;
+}
+function rider(){
+  const st=S.me.rider;
+  if(!st)return `<div class="panel"><h2>Become a rider</h2><p>Riders pick up items from sellers and deliver them to buyers, including at night. An admin approves each rider.</p><button data-apply>Apply to be a rider</button></div>`;
+  if(st==='pending')return '<div class="panel"><h2>Application pending</h2><p>An admin needs to approve you before you can see delivery jobs. Check back soon.</p></div>';
+  if(st==='rejected')return '<div class="panel"><h2>Application not approved</h2><p>Ask the admin if you think this is a mistake.</p></div>';
+  const wal=`<div class="panel"><label for="wl" style="margin-top:0">Your wallet address for delivery fees</label><input id="wl" maxlength="120" value="${esc(S.me.wallet||'')}"><div class="row"><button class="ghost" data-wallet>Save wallet</button></div><p class="note">Buyers see this after you accept their job, so they can pay your fee in crypto.</p></div>`;
+  if(!S.jobs.length)return wal+'<p class="empty">No delivery jobs right now.</p>';
+  const lab=['Accept job','I have the item','I have arrived'];
+  return wal+S.jobs.map(j=>`<section class="panel"><h3>${esc(j.title)}</h3><p class="meta">Pick up from ${esc(j.sellerName)}. ${j.addr?`Deliver to ${esc(j.addr)}.`:'Address shows after you accept.'} Time: ${esc(j.time)}. Delivery fee offered: ${money(j.fee)}.${j.mine?` Hand to: ${esc(j.recipient)}${j.phone?', phone '+esc(j.phone):''}.`:''}</p>
+${j.step===0?(j.locked?'<p class="meta">Another rider has made an offer on this job.</p>':j.myCounter!==null?`<p class="meta">Waiting for the buyer to answer your offer of ${money(j.myCounter)}.</p>`:`<div class="row"><button data-adv="${j.id}">Accept at ${money(j.fee)}</button></div><div class="row"><input id="cf${j.id}" type="number" min="0" placeholder="Your fee" style="max-width:160px"><button class="ghost" data-counter="${j.id}">Counter offer</button></div>`):j.step<3?`<button data-adv="${j.id}">${lab[j.step]}</button>`:`<label for="c${j.id}">Ask the buyer for their 4-digit code</label><div class="row"><input id="c${j.id}" inputmode="numeric" maxlength="4" style="max-width:140px"><button data-conf="${j.id}">Confirm handoff</button></div>`}</section>`).join('');
+}
+function admin(){
+  const a=S.admin;if(!a)return '<p class="empty">Loading...</p>';
+  return `<h2>Members</h2>${a.members.map(m=>`<div class="panel"><strong>${esc(m.name)}</strong> <span class="meta">${m.isAdmin?'Admin. ':''}${m.invitedBy?'Invited by '+esc(m.invitedBy):'Founder'}${m.banned?'. Suspended':''}</span>${m.isAdmin?'':`<div class="row"><button class="ghost" data-user="${m.id}:${m.banned?'unban':'ban'}">${m.banned?'Restore':'Suspend'}</button></div>`}</div>`).join('')}<h2 style="margin-top:20px">Riders</h2>${a.riders.length?a.riders.map(r=>`<div class="panel"><strong>${esc(r.name)}</strong> <span class="meta">${esc(r.status)}</span><div class="row">${r.status!=='approved'?`<button data-rider="${r.id}:approve">Approve</button>`:''}${r.status!=='rejected'?`<button class="ghost" data-rider="${r.id}:reject">${r.status==='approved'?'Remove':'Reject'}</button>`:''}</div></div>`).join(''):'<p class="note">No rider applications yet.</p>'}
+<h2 style="margin-top:20px">Reports</h2>${a.reports.length?a.reports.map(r=>`<div class="panel"><p class="meta">Order ${r.orderId}, reported by ${esc(r.by)}</p><p>${esc(r.text)}</p></div>`).join(''):'<p class="note">No reports.</p>'}`;
+}
+function render(){
+  const nav=$('nav'),who=$('who');
+  if(!S.me){nav.innerHTML='';who.innerHTML='';$('view').innerHTML=authView();return}
+  const tabs=[['browse','Browse'],['sell','Sell'],['messages','Messages'],['orders','Orders'],['invite','Invite'],['rider','Rider']];
+  if(S.me.isAdmin)tabs.push(['admin','Admin']);
+  nav.innerHTML=tabs.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${S.tab===k}">${l}</button>`).join('');
+  who.innerHTML=`${esc(S.me.name)}${S.me.isAdmin?' (admin)':''} <button class="ghost small" data-logout>Log out</button>`;
+  $('view').innerHTML=({browse,sell,messages,orders,invite,rider,admin})[S.tab]();
+}
+
+// ---------- chat ----------
+const msgsHtml=()=>S.chat.msgs.length?S.chat.msgs.map(x=>`<div class="msg ${x.mine?'me':''}">${esc(x.text)}</div>`).join(''):'<p class="note">Say hello to start the conversation.</p>';
+async function openChat(listingId,buyerId){
+  const r=await api('GET',`/messages?listing=${listingId}&buyer=${buyerId||''}`);
+  S.chat={listingId,buyerId:r.buyerId,msgs:r.messages};
+  openModal(`<h2>${esc(r.title)}</h2><p class="meta">Chat with ${esc(r.other)}</p><div class="msgs" id="msgs">${msgsHtml()}</div>
+<div class="row"><input id="cm" maxlength="500" placeholder="Write a message" aria-label="Message"><button data-send>Send</button></div><div class="row"><button class="ghost" data-close>Close</button></div>`);
+  S.chat.listingId=listingId;$('msgs').scrollTop=1e6;$('cm').focus();
+}
+async function pullChat(){
+  const c=S.chat;if(!c||!$('msgs'))return;
+  const r=await api('GET',`/messages?listing=${c.listingId}&buyer=${c.buyerId||''}`);
+  if(!S.chat||JSON.stringify(r.messages)===JSON.stringify(c.msgs))return;
+  c.msgs=r.messages;$('msgs').innerHTML=msgsHtml();$('msgs').scrollTop=1e6;
+}
+async function sendMsg(text){
+  const c=S.chat;if(!text)return;
+  const r=await api('POST','/messages',{listingId:c.listingId,buyerId:c.buyerId,text});
+  c.msgs=r.messages;$('msgs').innerHTML=msgsHtml();$('msgs').scrollTop=1e6;$('cm').value='';
+}
+
+// ---------- modals ----------
+function buyModal(id){
+  const l=S.listings.find(x=>x.id===id);if(!l)return;
+  openModal(`<h2>Buy ${esc(l.title)}</h2><p class="price">${money(l.price)}</p><p class="meta">Payment is in crypto${l.coins?' ('+esc(l.coins)+')':''}. Agree the coin and wallet address with the seller in chat.</p>
+<label for="ad">Delivery address</label><input id="ad" maxlength="200" placeholder="Street, area">
+<label for="tm">Delivery time</label><select id="tm">${TIMES.map(t=>`<option>${t}</option>`).join('')}</select>
+<label for="fe">Delivery fee you offer (\u20a6)</label><input id="fe" type="number" min="0" placeholder="e.g. 1500"><p class="note">Paid to the rider in crypto. A rider can accept it or ask for a different fee, and you decide.</p>
+<label for="rn">Who is receiving it? (optional)</label><input id="rn" maxlength="40" placeholder="Leave blank if it is you">
+<label for="ph">Recipient phone (optional)</label><input id="ph" maxlength="20" inputmode="tel">
+<p class="note">The rider only gets your address after accepting the job. You settle payment with the seller; the handoff code confirms delivery.</p>
+<div class="row"><button data-place="${id}">Place order</button><button class="ghost" data-close>Cancel</button></div>`);
+}
+function tradeModal(id){
+  const l=S.listings.find(x=>x.id===id);if(!l)return;
+  openModal(`<h2>Offer a trade for ${esc(l.title)}</h2><label for="to">What would you give?</label><input id="to" maxlength="200" placeholder="e.g. my PS4 controller"><label for="tc">Cash on top (\u20a6, optional)</label><input id="tc" type="number" min="0">
+<div class="row"><button data-sendtrade="${id}">Send offer</button><button class="ghost" data-close>Cancel</button></div>`);
+}
+function reportModal(id){
+  openModal(`<h2>Report a problem</h2><p class="note">This goes to the admin.</p><label for="rt">What happened?</label><textarea id="rt" rows="4" maxlength="300"></textarea><div class="row"><button data-sendreport="${id}">Send report</button><button class="ghost" data-close>Cancel</button></div>`);
+}
+function shrink(file){
+  return new Promise((ok,no)=>{const img=new Image(),r=new FileReader();
+    r.onload=()=>{img.onload=()=>{const k=Math.min(1,600/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.7))};img.onerror=()=>no(new Error('That file is not an image'));img.src=r.result};
+    r.onerror=()=>no(new Error('Could not read the photo'));r.readAsDataURL(file)});
+}
+
+// ---------- events ----------
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  run(async()=>{
+    if(d.tab){S.tab=d.tab;await refresh()}
+    else if('logout' in d){await api('POST','/logout',{});const r=await api('GET','/me');S.needInvite=r.needInvite;S.me=null;S.tab='browse';render()}
+    else if(d.auth){S.authMode=d.auth;render()}
+    else if(d.cat){S.cat=d.cat;render()}
+    else if(d.chat)await openChat(+d.chat,0);
+    else if(d.thread){const[a,c]=d.thread.split(':');await openChat(+a,+c)}
+    else if(d.trade)tradeModal(+d.trade);
+    else if(d.sendtrade){const w=$('to').value.trim();if(!w){$('to').focus();return}const c=+$('tc').value;
+      await api('POST','/messages',{listingId:+d.sendtrade,text:'Trade offer: '+w+(c?' plus '+money(c):'')});closeModal();await openChat(+d.sendtrade,0)}
+    else if('send' in d)await sendMsg($('cm').value.trim());
+    else if(d.buy)buyModal(+d.buy);
+    else if(d.place){const ad=$('ad').value.trim();if(!ad){$('ad').focus();return}
+      await api('POST','/orders',{listingId:+d.place,addr:ad,time:$('tm').value,fee:+$('fe').value||0,recipient:$('rn').value,phone:$('ph').value});
+      closeModal();S.tab='orders';await refresh();toast('Order placed')}
+    else if(d.del){await api('DELETE','/listings/'+d.del);await refresh();toast('Listing removed')}
+    else if(d.adv){await api('POST',`/orders/${d.adv}/advance`,{});await refresh()}
+    else if(d.conf){await api('POST',`/orders/${d.conf}/confirm`,{code:$('c'+d.conf).value});await refresh();toast('Handoff confirmed')}
+    else if(d.rate){const[i,n]=d.rate.split(':');await api('POST',`/orders/${i}/rate`,{n:+n});await refresh();toast('Thanks for rating')}
+    else if(d.report)reportModal(+d.report);
+    else if(d.sendreport){await api('POST',`/orders/${d.sendreport}/report`,{text:$('rt').value});closeModal();toast('Report sent to the admin')}
+    else if(d.answer){const[i,a]=d.answer.split(':');await api('POST',`/orders/${i}/answer`,{accept:a==='1'});await refresh()}
+    else if(d.newfee){await api('POST',`/orders/${d.newfee}/fee`,{fee:+$('nf'+d.newfee).value});await refresh();toast('Fee updated')}
+    else if(d.cancel){await api('POST',`/orders/${d.cancel}/cancel`,{});await refresh();toast('Order cancelled')}
+    else if(d.counter){await api('POST',`/orders/${d.counter}/counter`,{fee:+$('cf'+d.counter).value});await refresh();toast('Offer sent to the buyer')}
+    else if('wallet' in d){S.me=await api('POST','/wallet',{wallet:$('wl').value});toast('Wallet saved')}
+    else if('newinvite' in d){await api('POST','/invites',{});await refresh();toast('Invite created')}
+    else if('apply' in d){S.me=await api('POST','/rider/apply',{});await refresh();toast('Application sent')}
+    else if(d.user){const[i,a]=d.user.split(':');await api('POST','/admin/users/'+i,{action:a});await refresh()}
+    else if(d.rider){const[i,a]=d.rider.split(':');await api('POST','/admin/riders/'+i,{action:a});await refresh()}
+    else if('close' in d)closeModal();
+  });
+});
+document.addEventListener('input',e=>{if(e.target.id==='search'){S.q=e.target.value;$('grid').innerHTML=gridHtml()}});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal();
+  if(e.key==='Enter'&&e.target.id==='cm'){e.preventDefault();run(()=>sendMsg(e.target.value.trim()))}
+});
+document.addEventListener('submit',e=>{
+  e.preventDefault();const f=e.target.id;
+  run(async()=>{
+    if(f==='authForm'){
+      const su=S.authMode==='signup';
+      try{S.me=await api('POST',su?'/signup':'/login',{name:$('un').value,password:$('pw').value,rider:su&&$('rd').checked,invite:su&&$('iv')?$('iv').value:''})}
+      catch(err){$('aerr').textContent=err.message;return}
+      S.tab='browse';await refresh();
+    }else if(f==='sellForm'){
+      const file=$('f').files[0],img=file?await shrink(file):null;
+      await api('POST','/listings',{title:$('t').value,cat:$('cat').value,price:+$('p').value,desc:$('d').value,coins:$('co').value,img});
+      S.tab='browse';await refresh();toast('Listing posted');
+    }
+  });
+});
+$('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal()});
+
+// refresh every few seconds so new messages, orders and jobs show up
+setInterval(()=>run(async()=>{
+  if(document.hidden||!S.me)return;
+  if(S.chat){await pullChat();return}
+  if(modalOpen())return;
+  const a=document.activeElement&&document.activeElement.tagName;
+  if(a==='INPUT'||a==='TEXTAREA'||a==='SELECT')return;
+  await refresh();
+}),5000);
+
+run(async()=>{try{const r=await api('GET','/me');S.me=r.user;S.needInvite=r.needInvite}catch(e){}await refresh()});
+</script>
+</body>
+</html>
