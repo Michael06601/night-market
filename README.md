@@ -3,6 +3,12 @@
 A private, invite-only marketplace for a friend circle. Members list items, chat, make trade offers and order delivery. Riders pick up and deliver, and a 4-digit code confirms the handoff. Payments are crypto only and happen directly between people: the app never touches money. It has no dependencies and calls no third-party services, apart from Google Fonts for the typefaces (the app works fine without them). You run your own copy with Node.js 18 or newer (https://nodejs.org), so each community owns its own market.
 
 **Features:** accounts, invite-only joining, admin moderation (suspend members, approve riders), listings with photos and categories, buyer-seller chat, trade offers, delivery fee offers and counters, rider jobs, delivery code, ratings, problem reports.
+<img width="960" height="540" alt="Screenshot 2026-10-10 173558" src="https://github.com/user-attachments/assets/8f8b47dd-545f-4aa5-a2d6-c059ec7c2322" />
+<img width="960" height="540" alt="Screenshot 2026-10-10 173719" src="https://github.com/user-attachments/assets/6cef2ba2-3cc8-4fed-bf16-4f4c007e106e" />
+<img width="960" height="540" alt="Screenshot 2026-10-10 173706" src="https://github.com/user-attachments/assets/317bd0f8-c3b5-4a93-a652-23a73e7c4c23" />
+<img width="960" height="540" alt="Screenshot 2026-10-10 173655" src="https://github.com/user-attachments/assets/58e21469-848d-48d5-88fd-ec3bb704f02a" />
+<img width="960" height="540" alt="Screenshot 2026-10-10 173632" src="https://github.com/user-attachments/assets/13c10928-ffd3-4981-b29e-cfdbf20ff080" />
+<img width="960" height="540" alt="Screenshot 2026-10-10 173609" src="https://github.com/user-attachments/assets/6afff4b4-1483-408e-b035-3d6537ec21e4" />
 
 ## Run it
 
